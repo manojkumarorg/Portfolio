@@ -468,6 +468,7 @@
                   const submitting = document.querySelector('.submitting');
                   const formMessageWarning = document.getElementById('form-message-warning');
                   const formMessageSuccess = document.getElementById('form-message-success');
+                  const submitButton = contactForm.querySelector('input[type="submit"]'); // Get the submit button
                   
                   // Hide messages initially with CSS
                   submitting.style.display = 'none';
@@ -478,8 +479,10 @@
                     contactForm.addEventListener('submit', function(e) {
                       e.preventDefault();
                       
-                      // Hide both messages when submitting
-                      submitting.style.display = 'block';
+                      // Disable button and show sending message
+                      submitButton.disabled = true; 
+                      submitting.textContent = 'Sending...';
+                      submitting.style.display = 'inline'; // Show the submitting span
                       formMessageWarning.style.display = 'none';
                       formMessageSuccess.style.display = 'none';
                       formMessageWarning.textContent = '';
@@ -492,7 +495,9 @@
                       
                       // Form validation
                       if (!formData.name || !formData.email || !formData.message) {
-                        submitting.style.display = 'none';
+                        submitting.style.display = 'none'; // Hide submitting text
+                        submitting.textContent = '';
+                        submitButton.disabled = false; // Re-enable button
                         formMessageWarning.textContent = 'Please fill all required fields.';
                         formMessageWarning.style.display = 'block';
                         return;
@@ -507,8 +512,10 @@
                       })
                       .then(response => response.json())
                       .then(data => {
-                        // Always hide submitting indicator
+                        // Always hide submitting indicator and re-enable button
                         submitting.style.display = 'none';
+                        submitting.textContent = '';
+                        submitButton.disabled = false; 
                         
                         // Reset both message displays
                         formMessageWarning.style.display = 'none';
@@ -520,13 +527,16 @@
                           contactForm.reset();
                         } else {
                           // Show only error message
-                          formMessageWarning.textContent = data.message || '';
+                          formMessageWarning.textContent = data.message || 'An error occurred.';
                           formMessageWarning.style.display = 'block';
                         }
                       })
                       .catch(error => {
                         console.error('Error:', error);
+                        // Hide submitting indicator and re-enable button on error
                         submitting.style.display = 'none';
+                        submitting.textContent = '';
+                        submitButton.disabled = false; 
                         formMessageSuccess.style.display = 'none';
                         formMessageWarning.textContent = 'There was a problem sending your message. Please try again later.';
                         formMessageWarning.style.display = 'block';
